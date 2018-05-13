@@ -21,4 +21,4 @@ class Flatten:
 		self.shape = tuple([self.number]+list(self.FlatElements[0].shape))
 		self.isCompiled = True
 
-		return self
+		return self.shape 

@@ -28,4 +28,4 @@ class Dense:
 		self.WeightMatrixList = []
 		for i in range(self.number):
 			self.WeightMatrixList.append(WeightMatrix(previousLayerShape))
-		return self
+		return self.number 

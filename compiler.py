@@ -9,53 +9,10 @@ class Compiler:
 
 	def compile(self,network):
 		for count, layer in enumerate(network.layerStack):
-			self.input = self.getProcessedInput(layer)
+			#self.input = self.getProcessedInput(layer)
+			if count == 0:
+				self.input = tuple([layer.number] + list(self.input))
 			output = layer.compile(self.input)
 			self.input = output
-
-	def getLayerType(self,input):
-		if isinstance(input,ConvolutionalLayer):
-			return "convLayer"
-		if isinstance(input,Dense):
-			return "dense"
-		if isinstance(input,MaxPoolLayer):
-			return "maxPool"
-		if isinstance(input,Flatten):
-			return "flatten"
-		if isinstance(input,tuple):
-			return "tuple"
-		return "undefined"
-
-	def getProcessedInput(self,layer):
-		previousLayerType = self.getLayerType(self.input)
-		presentLayerType = self.getLayerType(layer)
-
-
-		if presentLayerType == "maxPool":
-			if previousLayerType == "convLayer":
-				self.input = self.input.shape
-
-			if previousLayerType == "maxPool":
-				self.input = self.input.shape
-
-		if presentLayerType == "convLayer":
-			if previousLayerType == "tuple":
-				self.input = tuple([layer.number]+list(self.input))
-			if previousLayerType == "convLayer":
-				self.input = self.input.shape
-			if previousLayerType == "maxPool":
-				self.input = self.input.shape
-		if presentLayerType == "flatten":
-			if previousLayerType == "maxPool":
-				self.input = self.input.shape
-			if previousLayerType == "convLayer":
-				self.input = self.input.shape
-
-
-		if presentLayerType =="dense":
-			if previousLayerType == "flatten":
-				self.input = self.input.shape
-			if previousLayerType == "dense":
-				self.input = self.input.number
 
 		return self.input
