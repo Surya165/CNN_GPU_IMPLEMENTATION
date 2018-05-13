@@ -1,0 +1,6 @@
+ConvolutionalNeuralNetwork object structure:
+	layerStack
+	error = forwardPropagate(input)
+	backwardPropagate(error)
+layerStack object structure:
+	stack of layers
