@@ -10,7 +10,6 @@ class Compiler:
 	def compile(self,network):
 		for count, layer in enumerate(network.layerStack):
 			self.input = self.getProcessedInput(layer)
-			print(self.input)
 			output = layer.compile(self.input)
 			self.input = output
 
@@ -31,8 +30,6 @@ class Compiler:
 		previousLayerType = self.getLayerType(self.input)
 		presentLayerType = self.getLayerType(layer)
 
-		print("presentLayerType: "+presentLayerType)
-		print("previousLayerType: "+previousLayerType)
 
 		if presentLayerType == "maxPool":
 			if previousLayerType == "convLayer":
@@ -47,14 +44,18 @@ class Compiler:
 			if previousLayerType == "convLayer":
 				self.input = self.input.shape
 			if previousLayerType == "maxPool":
-				self.input = input.shape
+				self.input = self.input.shape
 		if presentLayerType == "flatten":
 			if previousLayerType == "maxPool":
-				self.input =tuple([self.input.number]+list(self.input.shape))
+				self.input = self.input.shape
+			if previousLayerType == "convLayer":
+				self.input = self.input.shape
 
 
 		if presentLayerType =="dense":
 			if previousLayerType == "flatten":
 				self.input = self.input.shape
-				
+			if previousLayerType == "dense":
+				self.input = self.input.number
+
 		return self.input

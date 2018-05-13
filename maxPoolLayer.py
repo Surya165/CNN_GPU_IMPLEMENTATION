@@ -34,11 +34,11 @@ class MaxPoolLayer:
 		self.number = previousLayerShape[0]
 		for i in range(self.number):
 			self.FeatureMaps.append(FeatureMap(self.kernelShape,previousLayerShape[1:]))
-		self.shape = self.FeatureMaps[0].shape
+		self.shape = tuple([self.number]+list(self.FeatureMaps[0].shape))
 		return self
 
 
 	def printLayer(self):
-		print("maxPool Layer, kernelShape is " + str(self.kernelShape) )
+		print("MaxPoolLayer" )
 		if self.isCompiled:
-			print("shape of the activationMatrix is " + str(self.shape))
+			print(self.shape)

@@ -32,8 +32,11 @@ def main():
 	model = ConvolutionalNeuralNetwork()
 	model.addLayer(ConvolutionalLayer(30,(5,5)))
 	model.addLayer(MaxPoolLayer((5,5)))
+	model.addLayer(ConvolutionalLayer(100,(3,3)))
+	model.addLayer(MaxPoolLayer((3,3)))
 	model.addLayer(Flatten())
 	model.addLayer(Dense(30))
+	model.addLayer(Dense(100))
 	model.printModel()
 
 	inputImageShape = (28,28)
