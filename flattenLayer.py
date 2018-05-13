@@ -14,11 +14,15 @@ class Flatten:
 			print(str(self.shape))
 
 	def compile(self,previousLayerShape):
-		self.number = previousLayerShape[0]
-		self.FlatElements = []
-		for i in range(self.number):
-			self.FlatElements.append(FlatElement(previousLayerShape[1:]))
+		self.FlatElement = FlatElement(previousLayerShape[1:])
 		self.shape = tuple([self.number]+list(self.FlatElements[0].shape))
 		self.isCompiled = True
 
-		return self.shape 
+		return self.shape
+
+
+	def forwardPropagate():
+		pass
+	
+	def backwardPropagate():
+		pass

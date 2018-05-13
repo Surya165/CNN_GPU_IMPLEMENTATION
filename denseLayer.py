@@ -28,4 +28,10 @@ class Dense:
 		self.WeightMatrixList = []
 		for i in range(self.number):
 			self.WeightMatrixList.append(WeightMatrix(previousLayerShape))
-		return self.number 
+		return self.number
+
+	def forwardPropagate():
+		pass
+
+	def backwardPropagate():
+		pass

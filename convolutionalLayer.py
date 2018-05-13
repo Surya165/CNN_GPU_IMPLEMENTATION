@@ -56,3 +56,11 @@ class ConvolutionalLayer:
 			self.FeatureMaps.append(FeatureMap(self.kernelShape,previousLayerShape[1:]))
 		self.shape = tuple([self.number]+list(self.FeatureMaps[0].shape))
 		return self.shape
+
+
+
+	def forwardPropagate():
+		pass
+
+	def backwardPropagate():
+		pass
