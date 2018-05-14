@@ -5,7 +5,9 @@ from maxPoolLayer import MaxPoolLayer
 from denseLayer import Dense
 from flattenLayer import Flatten
 from compiler import Compiler
-
+from random import shuffle
+import _pickle as pkl
+from Trainer import Trainer
 
 class ConvolutionalNeuralNetwork:
 	def __init__(self):
@@ -25,6 +27,21 @@ class ConvolutionalNeuralNetwork:
 	def compile(self,input):
 		comp = Compiler(input)
 		comp.compile(self)
+		"""
+		for count, layer in enumerate(self.layerStack):
+			if count == 0:
+				input = tuple([len(input)] + list(input))
+			output = layer.compile(input)
+			input = output
+
+		return input"""
+
+	def train(self,dataset=None,numberOfEpochs=1,miniBatchSize=1):
+		trainer = Trainer(dataset,numberOfEpochs=1,miniBatchSize=1)
+		trainer.train(self)
+
+
+
 
 
 
@@ -37,10 +54,11 @@ def main():
 	model.addLayer(Flatten())
 	model.addLayer(Dense(30))
 	model.addLayer(Dense(100))
-	model.printModel()
 
-	inputImageShape = (28,28)
-	model.compile(inputImageShape)
+	f = open("trainingImage.pkl","rb")
+	inputImage = pkl.load(f,encoding="latin1")
+	model.compile(inputImage.shape)
 	print("##########\n\n")
 	model.printModel()
+	model.train(inputImage,numberOfEpochs=1,miniBatchSize=1)
 main()

@@ -1,20 +1,6 @@
 
 import numpy
 
-class FeatureMap:
-
-	def __init__(self,kernelShape,previousLayerShape):
-		self.shape = self.getShape(kernelShape,previousLayerShape)
-		self.activationMatrix = numpy.zeros(self.shape)
-
-	def getShape(self,kernelShape,previousLayerShape):
-
-		shape = []
-		for count,index in enumerate(previousLayerShape):
-			shape.append(index - kernelShape[count] + 1)
-		shape = tuple(shape)
-		return shape
-
 
 class MaxPoolLayer:
 
@@ -22,19 +8,27 @@ class MaxPoolLayer:
 		self.name = "maxPool"
 		self.kernelShape = kernelShape
 		self.isCompiled = False
-		self.FeatureMap = []
+
 
 
 
 
 	def compile(self,previousLayerShape):
+		self.previousLayerShape = previousLayerShape
 
 		self.isCompiled = True
-		self.FeatureMaps = []
-		self.number = previousLayerShape[0]
-		for i in range(self.number):
-			self.FeatureMaps.append(FeatureMap(self.kernelShape,previousLayerShape[1:]))
-		self.shape = tuple([self.number]+list(self.FeatureMaps[0].shape))
+		shape = previousLayerShape
+
+		mOld = shape[0]
+		nOld = shape[1]
+		pOld = shape[2]
+
+		mNew = mOld
+		nNew = nOld - self.kernelShape[0] + 1
+		pNew = pOld - self.kernelShape[0] + 1
+
+		self.shape = (mNew,nNew,pNew)
+		self.outputBuffer = numpy.zeros(self.shape)
 		return self.shape
 
 
@@ -42,10 +36,3 @@ class MaxPoolLayer:
 		print("MaxPoolLayer" )
 		if self.isCompiled:
 			print(self.shape)
-
-
-	def forwardPropagate():
-		pass
-
-	def backwardPropagate():
-		pass 
