@@ -1,6 +1,6 @@
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
 kernel void convLayer( __global double *inputBuffer,global int *inputBufferShape,__global double* outputBuffer
-	,__global double *weightBuffer,__global int *weightShapeBuffer
+	,__global double *weightBuffer,__global int *weightShapeBuffer,global double*biasBuffer
 	)
 {
 	int i,j,k;
@@ -78,6 +78,7 @@ kernel void convLayer( __global double *inputBuffer,global int *inputBufferShape
 	else
 	{}
 	*/
+	outputBuffer[index] = outputBuffer[index] - biasBuffer[index];
 	outputBuffer[index] = 1/(1+(double)exp(-1*outputBuffer[index]));
 	//outputBuffer[index] = index;
 

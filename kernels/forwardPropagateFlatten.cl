@@ -6,23 +6,24 @@ kernel void flatten(global double *inputBuffer,global int*inputShapeBuffer,globa
 	int number = inputShapeBuffer[0];
 	int rows = inputShapeBuffer[1];
 	int cols = inputShapeBuffer[2];
+	int index = gid;
 
 	outputBuffer[gid] = 0;
 	int mOld = 0;
 	int nOld = 0;
 	int pOld = 0;
 	int k = 0;
-	for(int i = 0; i < number; i ++)
+
+	int mNew = gid / rows;
+	int nNew = gid % rows;
+
+	int previousIndex = 0;
+	for (int i = 0; i < number; i ++)
 	{
-		k = gid;
-
-		nOld = k % rows;
-		k = k / rows;
-
-		pOld = k;
-
-		outputBuffer[gid] +=(double) inputBuffer[i*rows*cols+nOld*cols+pOld];
-
+		previousIndex = number*rows*cols+mNew*cols+nNew;
+		outputBuffer[index] = inputBuffer[previousIndex];
 	}
+
+
 
 }
