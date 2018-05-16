@@ -41,13 +41,23 @@ class CL:
 		return self.program
 
 	def getBuffer(self,input,mem_flag):
-		inputSize = numpy.product(list(input.shape))
-		input = numpy.resize(input,(inputSize,))
 		if(mem_flag == "READ_WRITE"):
 			flag = cl.mem_flags.READ_WRITE
 		if(mem_flag == "READ_ONLY"):
 			flag = cl.mem_flags.READ_ONLY
 		if(mem_flag == "WRITE_ONLY"):
 			flag = cl.mem_flags.WRITE_ONLY
-		input = cl.Buffer(self.context,flag,input.nbytes)
+		input = cl.Buffer(self.context,flag|cl.mem_flags.COPY_HOST_PTR,hostbuf=input)
 		return input
+	def clear(self,MemObjects):
+		for memObject in MemObjects:
+			memObject.release()
+
+	def getFilterMapImages(self,buffer,shape,type):
+		if(type=="float"):
+			type = numpy.float32
+		if(type=="int"):
+			type = numpy.uint32
+		c = numpy.zeros(numpy.product(list(shape)),dtype=type)
+		cl.enqueue_read_buffer(self.commandQueue,buffer,c).wait()
+		return c

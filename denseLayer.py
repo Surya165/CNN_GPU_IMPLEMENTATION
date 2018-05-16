@@ -9,7 +9,7 @@ class Dense:
 		print("Dense Layer. Number of Neurons = " + str(self.number))
 		print(str(self.weightBuffer.shape))
 
-	def compile(self,previousLayerShape):
+	def compile(self,previousLayerShape,cl):
 		shape = previousLayerShape
 		self.previousLayerShape = previousLayerShape
 
@@ -18,7 +18,7 @@ class Dense:
 
 		self.shape = tuple([self.number])
 		self.outputBuffer = numpy.zeros(self.shape)
-		self.weightBuffer = numpy.zeros((self.number,nOld))
+		self.weightBuffer = numpy.random.rand(self.number,nOld)
 		self.isCompiled = True
 
 		return self.shape

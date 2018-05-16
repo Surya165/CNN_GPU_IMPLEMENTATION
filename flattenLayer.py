@@ -10,7 +10,7 @@ class Flatten:
 		if self.isCompiled:
 			print(str(self.shape))
 
-	def compile(self,previousLayerShape):
+	def compile(self,previousLayerShape,cl):
 		shape = previousLayerShape
 		self.previousLayerShape = previousLayerShape
 
@@ -22,8 +22,13 @@ class Flatten:
 		pNew = pOld
 
 		self.shape = tuple([nNew*pNew])
-		self.outputBuffer = numpy.zeros(self.shape)
+		self.outputMatrix = numpy.zeros(self.shape)
 		self.isCompiled = True
+
+
+		self.outputBuffer = cl.getBuffer(self.outputMatrix,"READ_WRITE")
+		self.inputShapeBuffer = numpy.asarray(self.previousLayerShape)
+		self.inputShapeBuffer = cl.getBuffer(self.inputShapeBuffer,"READ_ONLY")
 		return self.shape
 
 
@@ -32,3 +37,6 @@ class Flatten:
 
 	def backwardPropagate():
 		pass
+
+	def getAttributeList(self):
+		return(self.inputShapeBuffer,self.outputBuffer)

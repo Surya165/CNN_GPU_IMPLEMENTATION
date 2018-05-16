@@ -13,7 +13,7 @@ class MaxPoolLayer:
 
 
 
-	def compile(self,previousLayerShape):
+	def compile(self,previousLayerShape,cl):
 		self.previousLayerShape = previousLayerShape
 
 		self.isCompiled = True
@@ -28,7 +28,11 @@ class MaxPoolLayer:
 		pNew = pOld - self.kernelShape[0] + 1
 
 		self.shape = (mNew,nNew,pNew)
-		self.outputBuffer = numpy.zeros(self.shape)
+		self.outputMatrix = numpy.zeros(self.shape)
+		self.outputBuffer = cl.getBuffer(self.outputMatrix,"READ_WRITE")
+
+		self.kernelShapeBuffer = numpy.asarray(self.kernelShape)
+		self.kernelShapeBuffer = cl.getBuffer(self.kernelShapeBuffer,"READ_ONLY")
 		return self.shape
 
 
@@ -36,3 +40,5 @@ class MaxPoolLayer:
 		print("MaxPoolLayer" )
 		if self.isCompiled:
 			print(self.shape)
+	def getAttributeList(self):
+		return (self.outputBuffer,self.kernelShapeBuffer)
