@@ -41,12 +41,12 @@ def runKernelForwardPropagate(programs,layer,inputBuffer,cl,count):
 
 	if(layer.name == "convLayer"):
 		program = programs[0]
-		inputShapeBuffer,outputBuffer,weightBuffer,weightShapeBuffer = layer.getAttributeList()
+		inputShapeBuffer,outputBuffer,weightBuffer,weightShapeBuffer,biasBuffer = layer.getAttributeList()
 		globalSize = layer.shape
 		t1=time()
 		program.convLayer(cl.commandQueue,globalSize,None,inputBuffer\
 		,inputShapeBuffer,outputBuffer,\
-		weightBuffer,weightShapeBuffer).wait()
+		weightBuffer,weightShapeBuffer,biasBuffer).wait()
 		t2=time()
 		#cl.clear([inputBuffer,inputShapeBuffer])
 		print("Time for convLayer is "+str(round((t2-t1)*100000)/100)+"ms")
