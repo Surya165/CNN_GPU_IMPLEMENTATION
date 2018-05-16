@@ -27,4 +27,10 @@ class Trainer:
 			outputBuffer = layer.forwardPropagate(inputBuffer,self.cl)
 			inputBuffer = outputBuffer
 		t2 = time()
-		print("Estimated Time for each Epoch is " +str(round((t2-t1)*1400))+"s")
+		numberOfEpochs = 30
+		numberOfImages = 1400
+		time2 =int(round((t2-t1)*numberOfImages*numberOfEpochs))
+		timeInMins = round(time2/60)
+		timeInSeconds = round(time2%60)
+		totalTime = str(timeInMins)+"Mins " + str(timeInSeconds) + "s"
+		print("Estimated Time for 30 Epochs is " +totalTime)
