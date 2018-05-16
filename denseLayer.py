@@ -1,4 +1,5 @@
 import numpy
+from time import time
 
 class Dense:
 	def __init__(self,number):
@@ -10,6 +11,7 @@ class Dense:
 
 	def compile(self,previousLayerShape,cl):
 		shape = previousLayerShape
+		self.program = cl.getProgram("kernels/forwardPropagateDense.cl")
 		self.previousLayerShape = previousLayerShape
 
 		nOld = shape[0]
@@ -28,3 +30,22 @@ class Dense:
 		self.isCompiled = True
 
 		return self.shape
+
+
+	def forwardPropagate(self,inputBuffer,cl):
+		globalSize = self.shape
+		t1 = time()
+		self.program.dense\
+		(\
+		cl.commandQueue,\
+		globalSize,\
+		None,\
+		inputBuffer,\
+		self.weightBuffer,\
+		self.weightShapeBuffer,\
+		self.biasBuffer,\
+		self.outputBuffer\
+		).wait()
+		t2 = time()
+		print("Time for dense is "+str(round((t2-t1)*100000)/100)+"ms")
+		return self.outputBuffer

@@ -1,5 +1,6 @@
 import numpy
 from cl import CL
+from time import time
 class ConvolutionalLayer:
 
 	def __init__(self,number,kernelShape):
@@ -14,6 +15,7 @@ class ConvolutionalLayer:
 			print(str(self.shape))
 			print(str(self.weightMatrix.shape))
 	def compile(self,previousLayerShape,cl):
+		self.cl = cl
 		self.previousLayerShape = previousLayerShape
 		self.isCompiled = True
 		shape = previousLayerShape
@@ -41,6 +43,8 @@ class ConvolutionalLayer:
 		self.outputBuffer = cl.getBuffer(self.outputMatrix,"READ_WRITE")
 		self.biasBuffer = cl.getBuffer(self.biasMatrix,"READ_WRITE")
 
+		self.program = cl.getProgram("kernels/forwardPropagateConv.cl")
+
 
 
 
@@ -51,3 +55,19 @@ class ConvolutionalLayer:
 	def getAttributeList(self):
 		return (self.inputShapeBuffer,self.outputBuffer,\
 		self.weightBuffer,self.weightShapeBuffer,self.biasBuffer)
+
+
+
+
+	def forwardPropagate(self,inputBuffer,cl):
+		globalSize = self.shape
+		t1 = time()
+		self.program.convLayer(cl.commandQueue,globalSize,None,inputBuffer\
+		,self.inputShapeBuffer,self.outputBuffer,\
+		self.weightBuffer,self.weightShapeBuffer,self.biasBuffer).wait()
+
+		t2=time()
+
+		#cl.clear([inputBuffer,inputShapeBuffer])
+		print("Time for convLayer is "+str(round((t2-t1)*100000)/100)+"ms")
+		return self.outputBuffer

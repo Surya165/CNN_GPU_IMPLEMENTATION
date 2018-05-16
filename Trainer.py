@@ -2,7 +2,6 @@ from cl import CL
 from time import time
 import cv2 as cv
 import numpy
-from forwardPropagateLibrary import forwardPropagate
 class Trainer:
 	def __init__(self,cl,dataset=None,numberOfEpochs=1,miniBatchSize=1):
 		self.cl = cl
@@ -19,6 +18,13 @@ class Trainer:
 
 	def train(self,network):
 		t1 = time()
-		forwardPropagate(self.inputImage,network,self.cl)
+		inputBuffer = self.cl.getBuffer(self.inputImage,"READ_ONLY")
 		t2 = time()
-		
+		print("Time taken for creation of the buffer is "+ str(round((t2-t1)*100000)/100)+"ms")
+		images = []
+		t1 = time()
+		for count,layer in enumerate(network.layerStack):
+			outputBuffer = layer.forwardPropagate(inputBuffer,self.cl)
+			inputBuffer = outputBuffer
+		t2 = time()
+		print("Estimated Time for each Epoch is " +str(round((t2-t1)*1400))+"s")

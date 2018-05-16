@@ -1,5 +1,6 @@
 
 import numpy
+from time import time
 
 
 class MaxPoolLayer:
@@ -15,6 +16,7 @@ class MaxPoolLayer:
 
 	def compile(self,previousLayerShape,cl):
 		self.previousLayerShape = previousLayerShape
+		self.program = cl.getProgram("kernels/forwardPropagateMaxPool.cl")
 
 		self.isCompiled = True
 		shape = previousLayerShape
@@ -42,3 +44,12 @@ class MaxPoolLayer:
 			print(self.shape)
 	def getAttributeList(self):
 		return (self.outputBuffer,self.kernelShapeBuffer)
+
+
+	def forwardPropagate(self,inputBuffer,cl):
+		globalSize = self.shape
+		t1 = time()
+		self.program.maxPool(cl.commandQueue,globalSize,None,inputBuffer,self.outputBuffer,self.kernelShapeBuffer).wait()
+		t2 = time()
+		print("Time for maxPool is "+str(round((t2-t1)*100000)/100)+"ms")
+		return self.outputBuffer

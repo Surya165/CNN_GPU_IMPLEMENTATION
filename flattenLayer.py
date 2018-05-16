@@ -1,5 +1,5 @@
 import numpy
-
+from time import time
 
 class Flatten:
 	def __init__(self):
@@ -11,6 +11,7 @@ class Flatten:
 			print(str(self.shape))
 
 	def compile(self,previousLayerShape,cl):
+		self.program = cl.getProgram("kernels/forwardPropagateFlatten.cl")
 		shape = previousLayerShape
 		self.previousLayerShape = previousLayerShape
 
@@ -32,8 +33,14 @@ class Flatten:
 		return self.shape
 
 
-	def forwardPropagate():
-		pass
+	def forwardPropagate(self,inputBuffer,cl):
+		globalSize = self.shape
+		t1 = time()
+		self.program.flatten(cl.commandQueue,globalSize,None,inputBuffer,self.inputShapeBuffer,self.outputBuffer).wait()
+		t2 = time()
+		print("Time for flatten is "+str(round((t2-t1)*100000)/100)+"ms")
+		#cl.clear([inputBuffer])
+		return self.outputBuffer
 
 	def backwardPropagate():
 		pass
