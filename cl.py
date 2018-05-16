@@ -7,6 +7,7 @@ class CL:
 
 	def createContextAndDevice(self):
 		platforms = cl.get_platforms();
+		print(len(platforms))
 		if len(platforms) == 0:
 			print ("Failed to find any OpenCL platforms.")
 			return None
@@ -15,6 +16,7 @@ class CL:
 	    # create a GPU-based context, and if that fails, try to create
 	    # a CPU-based context.
 		devices = platforms[0].get_devices(cl.device_type.GPU)
+		print("The number of GPU devices is "+str(len(devices)))
 		if len(devices) == 0:
 			print ("Could not find GPU device, trying CPU...")
 			devices = platforms[0].get_devices(cl.device_type.CPU)
@@ -25,6 +27,9 @@ class CL:
 	    # Create a context using the first devic
 		context = cl.Context([devices[0]])
 		return context, devices[0]
+
+
+
 
 	def CreateProgram(self,context, device, fileName):
 		kernelFile = open(fileName, 'r')
@@ -40,6 +45,9 @@ class CL:
 		self.program = self.CreateProgram(self.context,self.device,kernelFile)
 		return self.program
 
+
+
+
 	def getBuffer(self,input,mem_flag):
 		if(mem_flag == "READ_WRITE"):
 			flag = cl.mem_flags.READ_WRITE
@@ -49,13 +57,15 @@ class CL:
 			flag = cl.mem_flags.WRITE_ONLY
 		input = cl.Buffer(self.context,flag|cl.mem_flags.COPY_HOST_PTR,hostbuf=input)
 		return input
+
+
 	def clear(self,MemObjects):
 		for memObject in MemObjects:
 			memObject.release()
 
 	def getFilterMapImages(self,buffer,shape,type):
 		if(type=="float"):
-			type = numpy.float32
+			type = numpy.float64
 		if(type=="int"):
 			type = numpy.uint32
 		c = numpy.zeros(numpy.product(list(shape)),dtype=type)

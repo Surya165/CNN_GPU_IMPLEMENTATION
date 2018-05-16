@@ -1,4 +1,11 @@
-kernel void dense(global float*inputBuffer, global float * outputBuffer, global int*weightShapeBuffer)
+kernel void dense
+(
+		global float*inputBuffer,
+		global double *weightBuffer,
+		global int *weightShapeBuffer,
+		global double *biasBuffer
+		global double * outputBuffer,
+)
 {
 
 }

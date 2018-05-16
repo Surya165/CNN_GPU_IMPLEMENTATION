@@ -1,7 +1,13 @@
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
-kernel void convLayer( __global double *inputBuffer,global int *inputBufferShape,__global double* outputBuffer
-	,__global double *weightBuffer,__global int *weightShapeBuffer,global double*biasBuffer
-	)
+kernel void convLayer
+(
+	global double *inputBuffer,
+	global int *inputBufferShape,
+	global double* outputBuffer,
+	global double *weightBuffer,
+	global int *weightShapeBuffer,
+	global double*biasBuffer
+)
 {
 	int i,j,k;
 

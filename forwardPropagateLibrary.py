@@ -5,7 +5,6 @@ import numpy
 from time import sleep
 import pyopencl
 def forwardPropagate(inputImage,network,cl):
-	print("Setting Up GPU")
 
 	kernelFiles = ["kernels/forwardPropagateConv.cl","kernels/forwardPropagateMaxPool.cl","kernels/forwardPropagateFlatten.cl"\
 	,"kernels/forwardPropagateDense.cl"]
@@ -19,8 +18,6 @@ def forwardPropagate(inputImage,network,cl):
 		programs.append(cl.getProgram(kernelFile))
 	t2 = time()
 	print("Time taken to build programs = "+str(round((t2-t1)*100000)/100)+"ms")
-	print(inputImage.shape)
-
 
 	buffer = cl.getBuffer(inputImage,"READ_ONLY")
 	images = []
@@ -30,7 +27,7 @@ def forwardPropagate(inputImage,network,cl):
 			break
 		buffer = runKernelForwardPropagate(programs,layer,buffer,cl,count)
 	t2 = time()
-	print("Time taken for forwardPropagate = "+str(round((t2-t1)*100000)/100)+"ms")
+	print("Estimated Time for each Epoch is " +str(round((t2-t1)*1400))+"s")
 
 
 
@@ -89,7 +86,10 @@ def runKernelForwardPropagate(programs,layer,inputBuffer,cl,count):
 
 	return outputBuffer
 
-def printBuffer(outputBuffer,shape,cl):
-	image = numpy.zeros(shape,dtype=numpy.float64)
+def printBuffer(outputBuffer,shape,cl,type):
+	if type == "int":
+		image = numpy.zeros(shape,dtype=numpy.uint32)
+	if type=="double":
+		image = numpy.zeros(shape,dtype=numpy.float64)
 	pyopencl.enqueue_read_buffer(cl.commandQueue,outputBuffer,image)
 	print(image)

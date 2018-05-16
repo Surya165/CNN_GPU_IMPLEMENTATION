@@ -4,10 +4,9 @@ class Dense:
 	def __init__(self,number):
 		self.name = "dense"
 		self.number = number
-		self.activationMatrix = []
 	def printLayer(self):
 		print("Dense Layer. Number of Neurons = " + str(self.number))
-		print(str(self.weightBuffer.shape))
+		print(str(self.weightMatrix.shape))
 
 	def compile(self,previousLayerShape,cl):
 		shape = previousLayerShape
@@ -17,13 +16,15 @@ class Dense:
 
 
 		self.shape = tuple([self.number])
-		self.outputBuffer = numpy.zeros(self.shape)
-		self.weightBuffer = numpy.random.rand(self.number,nOld)
+		self.outputMatrix = numpy.zeros(self.shape)
+		self.weightMatrix = numpy.random.rand(self.number,nOld)
+		self.biasMatrix = numpy.random.rand(self.number)
+		self.weightShapeMatrix = numpy.asarray([self.number]+list(self.weightMatrix.shape))
+
+		self.weightBuffer = cl.getBuffer(self.weightMatrix,"READ_WRITE")
+		self.weightShapeBuffer = cl.getBuffer(self.weightShapeMatrix,"READ_WRITE")
+		self.outputBuffer = cl.getBuffer(self.outputMatrix,"READ_WRITE")
+		self.biasBuffer = cl.getBuffer(self.biasMatrix,"READ_WRITE")
 		self.isCompiled = True
 
 		return self.shape
-	def forwardPropagate():
-		pass
-
-	def backwardPropagate():
-		pass

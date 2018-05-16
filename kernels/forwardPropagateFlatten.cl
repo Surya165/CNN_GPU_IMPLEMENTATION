@@ -10,7 +10,6 @@ kernel void flatten(global double *inputBuffer,global int*inputShapeBuffer,globa
 
 	outputBuffer[gid] = 0;
 	int mOld = 0;
-	int nOld = 0;
 	int pOld = 0;
 	int k = 0;
 
