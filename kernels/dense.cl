@@ -5,8 +5,9 @@ kernel void forwardPropagate(
 		global int *weightShapeBuffer,
 		global double *biasBuffer,
 		global double *outputBuffer
-)
+		)
 {
+
 
 
 	int numberOfNeurons = get_global_size(0);
@@ -36,14 +37,17 @@ kernel void backwardPropagate
 	global int *weightShapeBuffer,
 	global double *biasBuffer,
 	global double *outputBuffer,
-	global double *trainingParams,
-	global double *nextErrorBuffer
+	global int *trainingParams,
+	global double *nextErrorBuffer,
+	global double *previousOutputBuffer
 )
 {
 
-	double lambdaValue = trainingParams[0];
-	double etaValue = trainingParams[1];
-	double layerCount = trainingParams[2];
+
+	int epochCount = trainingParams[2] / 100;
+
+	float eta = 9.0;
+
 
 	int numberOfNeurons = get_global_size(0);
 	int numberOfInputNeurons = get_global_size(1);
@@ -53,16 +57,26 @@ kernel void backwardPropagate
 	int weightIndex = outputIndex*numberOfInputNeurons+inputIndex;
 
 
+
+
+
+
+	//based on the equation errj = oj(1-oj)(ei),deltawij = eta*errij*oi,deltabias = eta*errj
+	double Oj = outputBuffer[outputIndex];
+	double Ei = errorBuffer[outputIndex];
+
+	double Oi = previousOutputBuffer[inputIndex];
+	double Ej = Oj * (1-Oj) *Ei;
 	if(inputIndex == 0)
 	{
-		double deltaBias = -1*etaValue*errorBuffer[outputIndex];
+		double deltaBias = eta*Ej;
 		biasBuffer[outputIndex] += deltaBias;
 	}
-	double deltaWeight = -1 *etaValue* outputBuffer[outputIndex]*errorBuffer[outputIndex];
-	weightBuffer[weightIndex] += deltaWeight;
+	weightBuffer[weightIndex] += eta*Ej*Oi;
 
 
-	nextErrorBuffer[inputIndex] += deltaWeight;
+	nextErrorBuffer[inputIndex] += eta*Ej*Oi;
+
 
 
 }

@@ -3,6 +3,7 @@ import pyopencl as cl
 import numpy
 import math
 import _pickle as pkl
+from trashObject import trashObject
 
 
 kernelStr = "kernel void add(global float *a,global float *b, global float *c)\
@@ -13,7 +14,7 @@ kernelStr = "kernel void add(global float *a,global float *b, global float *c)\
 	int gidSize1 = get_global_size(0);\
 	if(gid == 0)\
 	{\
-		a[gid] = 0;\
+		a[gid] ++;\
 	}\
 	else\
 	{\
@@ -21,7 +22,7 @@ kernelStr = "kernel void add(global float *a,global float *b, global float *c)\
 	}\
 	if(gid2 == 0)\
 	{\
-		b[gid2] = 0;\
+		b[gid2] ++;\
 	}\
 	else\
 	{\
@@ -64,12 +65,13 @@ mf = cl.mem_flags
 a2 = a
 b2 = b
 c2 = c
-a = cl.Buffer(context,mf.READ_WRITE,a.nbytes)
-b = cl.Buffer(context,mf.READ_WRITE,b.nbytes)
+a = cl.Buffer(context,mf.READ_WRITE | mf.COPY_HOST_PTR,hostbuf=a2)
+b = cl.Buffer(context,mf.READ_WRITE | mf.COPY_HOST_PTR,hostbuf=b2)
 c = cl.Buffer(context,mf.READ_WRITE,c.nbytes)
 t3 = time.time()
 print("Time taken for setting GPU is "+str(t3-t2))
-program.add(commandQueue,(5,5,5),None,a,b,c)
+for i in range(100):
+	program.add(commandQueue,(5,5,5),None,a,b,c)
 cl.enqueue_read_buffer(commandQueue,a,a2).wait()
 cl.enqueue_read_buffer(commandQueue,b,b2).wait()
 cl.enqueue_read_buffer(commandQueue,c,c2).wait()
@@ -83,4 +85,7 @@ print(a2,b2,c2)
 image = pkl.load(open("trainingImage.pkl","rb"),encoding="latin1")
 buffer = cl.Buffer(context,cl.mem_flags.READ_ONLY|cl.mem_flags.COPY_HOST_PTR,hostbuf=image)
 cl.enqueue_read_buffer(commandQueue, buffer, image)
-print(image)
+#print(image)
+
+
+trash = trashObject()

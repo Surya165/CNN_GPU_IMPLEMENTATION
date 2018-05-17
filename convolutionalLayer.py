@@ -34,7 +34,7 @@ class ConvolutionalLayer:
 		self.shape = (mNew,nNew,pNew)
 		self.outputMatrix = numpy.random.normal(0,1.0,(mNew,nNew,pNew))
 		self.weightMatrix = numpy.random.normal(0,1.0,(mNew,self.kernelShape[0],self.kernelShape[1],mOld))
-		self.biasMatrix = numpy.random.normal(0,1.0,(mNew,nNew,pNew))
+		self.biasMatrix = numpy.random.normal(0,1.0,(mNew))
 
 		self.weightShapeBuffer = numpy.asarray(list(self.weightMatrix.shape))
 		self.weightShapeBuffer = cl.getBuffer(self.weightShapeBuffer,"READ_ONLY")
@@ -77,5 +77,35 @@ class ConvolutionalLayer:
 		t2=time()
 
 		#cl.clear([inputBuffer,inputShapeBuffer])
-		print("Time for convLayer is "+str(round((t2-t1)*100000)/100)+"ms")
+		#print("Time for convLayer is "+str(round((t2-t1)*100000)/100)+"ms")
 		return self.outputBuffer
+
+	def backwardPropagate(self,errorBuffer,cl,lambdaValue,etaValue,count,previousOutputBuffer):
+		trainingParams = numpy.zeros((3,),dtype=numpy.float64)
+		trainingParams[0] = lambdaValue
+		trainingParams[1] = etaValue
+		trainingParams[2] = count
+		trainingParamsBuffer = cl.getBuffer(trainingParams,"READ_WRITE")
+		globalSize = self.weightMatrix.shape[0:2]
+		nextErrorBuffer = numpy.zeros(self.previousLayerShape,dtype=numpy.float64)
+		nextErrorBuffer = cl.getBuffer(nextErrorBuffer,"READ_WRITE")
+		t1 = time()
+		biasBuffer = self.biasBuffer
+		self.previousOutputBuffer = previousOutputBuffer
+		self.program.backwardPropagate\
+		(\
+		cl.commandQueue,\
+		globalSize,\
+		None,\
+		errorBuffer,\
+		self.weightBuffer,\
+		self.weightShapeBuffer,\
+		biasBuffer,\
+		self.outputBuffer,\
+		trainingParamsBuffer,\
+		nextErrorBuffer,\
+		previousOutputBuffer,\
+		self.inputShapeBuffer\
+		).wait()
+		self.biasBuffer = biasBuffer
+		return nextErrorBuffer

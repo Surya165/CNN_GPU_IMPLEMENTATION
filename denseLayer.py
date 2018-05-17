@@ -1,5 +1,6 @@
 import numpy
 from time import time
+import pyopencl
 
 class Dense:
 	def __init__(self,number):
@@ -46,21 +47,21 @@ class Dense:
 		self.outputBuffer\
 		).wait()
 		t2 = time()
-		print("Time for dense is "+str(round((t2-t1)*100000)/100)+"ms")
+		#print("Time for dense is "+str(round((t2-t1)*100000)/100)+"ms")
 		return self.outputBuffer
 
 
-	def backwardPropagate(self,errorBuffer,cl,lambdaValue,etaValue,layerCount):
-
+	def backwardPropagate(self,errorBuffer,cl,lambdaValue,etaValue,layerCount,previousOutputBuffer):
 		trainingParams = numpy.zeros((3,),dtype=numpy.float64)
-		trainingParams[0] = float(lambdaValue)
-		trainingParams[1] = float(etaValue)
-		trainingParams[2] = float(layerCount)
+		trainingParams[0] = lambdaValue
+		trainingParams[1] = etaValue
+		trainingParams[2] = layerCount
 		trainingParamsBuffer = cl.getBuffer(trainingParams,"READ_WRITE")
 		globalSize = self.weightMatrix.shape
 		nextErrorBuffer = numpy.zeros(self.previousLayerShape,dtype=numpy.float64)
 		nextErrorBuffer = cl.getBuffer(nextErrorBuffer,"READ_WRITE")
 		t1 = time()
+		self.previousOutputBuffer = previousOutputBuffer
 		self.program.backwardPropagate\
 		(\
 		cl.commandQueue,\
@@ -72,6 +73,8 @@ class Dense:
 		self.biasBuffer,\
 		self.outputBuffer,\
 		trainingParamsBuffer,\
-		nextErrorBuffer\
+		nextErrorBuffer,\
+		previousOutputBuffer\
 		).wait()
+		self.shit = pyopencl.enqueue_read_buffer(cl.commandQueue,self.biasBuffer,self.biasMatrix)
 		return nextErrorBuffer

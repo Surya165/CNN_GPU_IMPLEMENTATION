@@ -63,12 +63,13 @@ class MaxPoolLayer:
 		self.maxIndexBuffer\
 		).wait()
 		t2 = time()
-		print("Time for maxPool is "+str(round((t2-t1)*100000)/100)+"ms")
+		#print("Time for maxPool is "+str(round((t2-t1)*100000)/100)+"ms")
 		return self.outputBuffer
 
-	def backwardPropagate(self,errorBuffer,cl,lambdaValue,etaValue,count):
+	def backwardPropagate(self,errorBuffer,cl,lambdaValue,etaValue,count,previousOutputBuffer):
 		globalSize = self.shape
 		nextErrorBuffer = cl.getBuffer(numpy.zeros(self.previousLayerShape,dtype=numpy.float64),"READ_WRITE")
+		self.previousLayerShapeBuffer = cl.getBuffer(numpy.asarray(self.previousLayerShape),"READ_WRITE")
 		self.program.backwardPropagate\
 		(\
 		cl.commandQueue,\
@@ -77,5 +78,5 @@ class MaxPoolLayer:
 		errorBuffer,\
 		nextErrorBuffer,\
 		self.maxIndexBuffer,\
-		self.previousLayerShape\
+		self.previousLayerShapeBuffer\
 		).wait()

@@ -3,10 +3,10 @@ kernel void forwardPropagate
 (
 	global double *inputBuffer,
 	global int *inputBufferShape,
-	global double* outputBuffer,
+	global double * outputBuffer,
 	global double *weightBuffer,
 	global int *weightShapeBuffer,
-	global double*biasBuffer
+	global double  *biasBuffer
 )
 {
 	int i,j,k;
@@ -95,5 +95,69 @@ kernel void forwardPropagate
 
 
 
+
+}
+
+
+
+kernel void backwardPropagate
+(
+	global double *errorBuffer,
+	global double *weightBuffer,
+	global int *weightShapeBuffer,
+	global double *biasBuffer,
+	global double *outputBuffer,
+	global int* trainingParams,
+	global double *nextErrorBuffer,
+	global double *previousOutputBuffer,
+	global int* previousLayerShape
+)
+{
+	int filterMapNumber = get_global_id(0);
+	int i = get_global_id(1);
+	int j = get_global_id(2);
+
+
+	int epochCount = trainingParams[2] / 100;
+	float etaValue = 9.0;
+
+
+
+	int numberOfRowsInKernel = weightShapeBuffer[1];
+	int numberOfColsInKernel = weightShapeBuffer[2];
+
+	int outputIndex = filterMapNumber*numberOfRowsInKernel*numberOfColsInKernel+i*numberOfColsInKernel+j;
+	int inputNumberOfRows;
+	int inputNumberOfCols;
+
+	inputNumberOfRows = previousLayerShape[1];
+	inputNumberOfCols = previousLayerShape[2];
+
+	int inputIndexI;
+	int inputIndexJ;
+
+	//only considering the kernel at point (0,0)
+	inputIndexI = i;
+	inputIndexJ =j;
+
+	double Oj = outputBuffer[outputIndex];
+	double Ek = errorBuffer[outputIndex];
+	double Ej = Oj*(1-Oj)*Ek;
+	double Oi;
+	int inputIndex;
+	for ( int inputFilterMapNumber = 0; inputFilterMapNumber < previousLayerShape[0]; inputFilterMapNumber ++)
+	{
+		inputIndex = inputFilterMapNumber * inputNumberOfRows * inputNumberOfCols + inputIndex*inputNumberOfCols+j;
+		Oi = previousOutputBuffer[inputIndex];
+		weightBuffer[outputIndex] += etaValue*Ej*Oi;
+
+	}
+	if(i == 0 && j == 0)
+	{
+		biasBuffer[filterMapNumber] += etaValue*Ej;
+		biasBuffer[filterMapNumber] = 0;
+	}
+
+	biasBuffer[filterMapNumber] = 0;
 
 }

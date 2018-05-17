@@ -45,11 +45,11 @@ class Flatten:
 		self.outputBuffer\
 		).wait()
 		t2 = time()
-		print("Time for flatten is "+str(round((t2-t1)*100000)/100)+"ms")
+		#print("Time for flatten is "+str(round((t2-t1)*100000)/100)+"ms")
 		#cl.clear([inputBuffer])
 		return self.outputBuffer
 
-	def backwardPropagate(self,errorBuffer,cl,lambdaValue,etaValue,count):
+	def backwardPropagate(self,errorBuffer,cl,lambdaValue,etaValue,count,previousOutputBuffer):
 		globalSize = self.previousLayerShape
 		nextErrorBuffer = cl.getBuffer(numpy.zeros(self.previousLayerShape,dtype=numpy.float64),"READ_WRITE")
 		self.program.backwardPropagate\

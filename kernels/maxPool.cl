@@ -57,11 +57,12 @@ kernel void forwardPropagate
 
 }
 
+
 kernel void backwardPropagate
 (
 	global double* errorBuffer,
 	global double* nextErrorBuffer,
-	global int*maxIndexBuffer,
+	global int*  maxIndexBuffer,
 	global int*previousLayerShape
 )
 {

@@ -49,13 +49,10 @@ class CL:
 
 
 	def getBuffer(self,input,mem_flag):
-		if(mem_flag == "READ_WRITE"):
-			flag = cl.mem_flags.READ_WRITE
-		if(mem_flag == "READ_ONLY"):
-			flag = cl.mem_flags.READ_ONLY
-		if(mem_flag == "WRITE_ONLY"):
-			flag = cl.mem_flags.WRITE_ONLY
-		input = cl.Buffer(self.context,flag|cl.mem_flags.COPY_HOST_PTR,hostbuf=input)
+		if(mem_flag == "READ_WRITE" or mem_flag == "READ_ONLY"):
+			flag = cl.mem_flags.READ_WRITE | cl.mem_flags.COPY_HOST_PTR
+
+		input = cl.Buffer(self.context,flag,hostbuf=input)
 		return input
 
 
