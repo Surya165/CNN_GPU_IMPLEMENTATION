@@ -11,7 +11,7 @@ class Dense:
 
 	def compile(self,previousLayerShape,cl):
 		shape = previousLayerShape
-		self.program = cl.getProgram("kernels/forwardPropagateDense.cl")
+		self.program = cl.getProgram("kernels/dense.cl")
 		self.previousLayerShape = previousLayerShape
 
 		nOld = shape[0]
@@ -19,9 +19,9 @@ class Dense:
 
 		self.shape = tuple([self.number])
 		self.outputMatrix = numpy.zeros(self.shape)
-		self.weightMatrix = numpy.random.rand(self.number,nOld)
-		self.biasMatrix = numpy.random.rand(self.number)
-		self.weightShapeMatrix = numpy.asarray([self.number]+list(self.weightMatrix.shape))
+		self.weightMatrix = numpy.random.normal(0,1.0,(self.number,nOld))
+		self.biasMatrix = numpy.random.normal(0.0,1.0,(self.number))
+		self.weightShapeMatrix = numpy.asarray(list(self.weightMatrix.shape))
 
 		self.weightBuffer = cl.getBuffer(self.weightMatrix,"READ_WRITE")
 		self.weightShapeBuffer = cl.getBuffer(self.weightShapeMatrix,"READ_WRITE")
@@ -35,8 +35,7 @@ class Dense:
 	def forwardPropagate(self,inputBuffer,cl):
 		globalSize = self.shape
 		t1 = time()
-		self.program.dense\
-		(\
+		self.program.forwardPropagate(\
 		cl.commandQueue,\
 		globalSize,\
 		None,\
@@ -49,3 +48,20 @@ class Dense:
 		t2 = time()
 		print("Time for dense is "+str(round((t2-t1)*100000)/100)+"ms")
 		return self.outputBuffer
+
+
+	def backwardPropagate(self,errorBuffer,cl,lambdaValue,etaValue,isOuterLayer):
+		if isOuterLayer:
+			errorBufferShape = layer.number
+
+		globalSize = layer.weightMatrix.shape
+		t1 = time()
+		self.program.backwardPropagate\
+		(\
+		cl.commandQueue,\
+		globalSize,\
+		errorBuffer,\
+		self.weightBuffer,\
+		self.weightShapeBuffer,\
+		self.outputBuffer\
+		)

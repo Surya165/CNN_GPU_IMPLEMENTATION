@@ -18,7 +18,7 @@ def main():
 	model.addLayer(MaxPoolLayer((5,5)))
 	model.addLayer(Flatten())
 	model.addLayer(Dense(30))
-	model.addLayer(Dense(100))
+	model.addLayer(Dense(10))
 
 	f = open("trainingImage.pkl","rb")
 	inputImage = pkl.load(f,encoding="latin1")

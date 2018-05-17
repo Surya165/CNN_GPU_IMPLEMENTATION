@@ -1,4 +1,4 @@
-kernel void maxPool(global float* inputBuffer, global float* outputBuffer, global int * kernelShape)
+kernel void forwardPropagate(global float* inputBuffer, global float* outputBuffer, global int * kernelShape)
 {
 
 	int mNew = get_global_id(0);

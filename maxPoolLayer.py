@@ -16,7 +16,7 @@ class MaxPoolLayer:
 
 	def compile(self,previousLayerShape,cl):
 		self.previousLayerShape = previousLayerShape
-		self.program = cl.getProgram("kernels/forwardPropagateMaxPool.cl")
+		self.program = cl.getProgram("kernels/maxPool.cl")
 
 		self.isCompiled = True
 		shape = previousLayerShape
@@ -49,7 +49,14 @@ class MaxPoolLayer:
 	def forwardPropagate(self,inputBuffer,cl):
 		globalSize = self.shape
 		t1 = time()
-		self.program.maxPool(cl.commandQueue,globalSize,None,inputBuffer,self.outputBuffer,self.kernelShapeBuffer).wait()
+		self.program.forwardPropagate(\
+		cl.commandQueue,\
+		globalSize,\
+		None,\
+		inputBuffer,\
+		self.outputBuffer,\
+		self.kernelShapeBuffer\
+		).wait()
 		t2 = time()
 		print("Time for maxPool is "+str(round((t2-t1)*100000)/100)+"ms")
 		return self.outputBuffer

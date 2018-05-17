@@ -1,5 +1,5 @@
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
-kernel void convLayer
+kernel void forwardPropagate
 (
 	global double *inputBuffer,
 	global int *inputBufferShape,

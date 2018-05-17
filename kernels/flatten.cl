@@ -1,5 +1,5 @@
 #pragma OPENCL EXTENSION cl_khr_fp64 : enable
-kernel void flatten(global double *inputBuffer,global int*inputShapeBuffer,global double * outputBuffer)
+kernel void forwardPropagate(global double *inputBuffer,global int*inputShapeBuffer,global double * outputBuffer)
 {
 
 	int gid = get_global_id(0);

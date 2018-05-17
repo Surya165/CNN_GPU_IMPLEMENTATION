@@ -18,6 +18,7 @@ class Trainer:
 
 	def train(self,network):
 		t1 = time()
+		cl = self.cl
 		inputBuffer = self.cl.getBuffer(self.inputImage,"READ_ONLY")
 		t2 = time()
 		print("Time taken for creation of the buffer is "+ str(round((t2-t1)*100000)/100)+"ms")
@@ -27,10 +28,47 @@ class Trainer:
 			outputBuffer = layer.forwardPropagate(inputBuffer,self.cl)
 			inputBuffer = outputBuffer
 		t2 = time()
-		numberOfEpochs = 30
-		numberOfImages = 1400
-		time2 =int(round((t2-t1)*numberOfImages*numberOfEpochs))
+		forwardPropagateTime = t2-t1
+
+		errorBuffer = outputBuffer
+
+		t1 = time()
+		lambdaValue = 0
+		etaValue = 0.001
+
+		"""
+		for count, layer in enumerate(network.layerStack[::-1]):
+			if layer.name != "dense":
+				break
+			errorBuffer = layer.backwardPropagate(errorBuffer,self.cl,lambdaValue,etaValue)
+		t2 = time()
+		"""
+		backwardPropagateTime = t2-t1
+
+
+		totalTime = backwardPropagateTime + forwardPropagateTime
+
+
+
+		#output = numpy.zeros((layer.number,),dtype=numpy.float64)
+		#cl.enqueue_read_buffer(cl.commandQueue,outputBuffer,output)
+		output = cl.getFilterMapImages(outputBuffer,(layer.number,),"float")
+
+		maxOutput = max(output)
+		for i in range(len(output)):
+			if output[i] == maxOutput:
+				print(i)
+				break
+
+
+		self.numberOfEpochs = 300
+		self.miniBatchSize = 10
+		numberOfImages = 7000/self.miniBatchSize
+		time2 =int(round((totalTime)*numberOfImages*self.numberOfEpochs))
+		timeInHrs = round(int(round(time2/60))/60)
+		time2 = time2 % 3600
 		timeInMins = round(time2/60)
 		timeInSeconds = round(time2%60)
-		totalTime = str(timeInMins)+"Mins " + str(timeInSeconds) + "s"
-		print("Estimated Time for 30 Epochs is " +totalTime)
+
+		totalTime = str(timeInHrs)+"Hrs "+str(timeInMins)+"Mins " + str(timeInSeconds) + "s"
+		print("Estimated Time for "+str(self.numberOfEpochs)+" Epochs is " +totalTime)

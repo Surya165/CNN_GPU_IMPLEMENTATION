@@ -32,9 +32,9 @@ class ConvolutionalLayer:
 
 
 		self.shape = (mNew,nNew,pNew)
-		self.outputMatrix = numpy.random.rand(mNew,nNew,pNew)
-		self.weightMatrix = numpy.random.rand(mNew,self.kernelShape[0],self.kernelShape[1],mOld)
-		self.biasMatrix = numpy.random.rand(mNew,nNew,pNew)
+		self.outputMatrix = numpy.random.normal(0,1.0,(mNew,nNew,pNew))
+		self.weightMatrix = numpy.random.normal(0,1.0,(mNew,self.kernelShape[0],self.kernelShape[1],mOld))
+		self.biasMatrix = numpy.random.normal(0,1.0,(mNew,nNew,pNew))
 
 		self.weightShapeBuffer = numpy.asarray(list(self.weightMatrix.shape))
 		self.weightShapeBuffer = cl.getBuffer(self.weightShapeBuffer,"READ_ONLY")
@@ -43,7 +43,7 @@ class ConvolutionalLayer:
 		self.outputBuffer = cl.getBuffer(self.outputMatrix,"READ_WRITE")
 		self.biasBuffer = cl.getBuffer(self.biasMatrix,"READ_WRITE")
 
-		self.program = cl.getProgram("kernels/forwardPropagateConv.cl")
+		self.program = cl.getProgram("kernels/conv.cl")
 
 
 
@@ -62,9 +62,17 @@ class ConvolutionalLayer:
 	def forwardPropagate(self,inputBuffer,cl):
 		globalSize = self.shape
 		t1 = time()
-		self.program.convLayer(cl.commandQueue,globalSize,None,inputBuffer\
-		,self.inputShapeBuffer,self.outputBuffer,\
-		self.weightBuffer,self.weightShapeBuffer,self.biasBuffer).wait()
+		self.program.forwardPropagate(\
+		cl.commandQueue,\
+		globalSize,\
+		None,\
+		inputBuffer,\
+		self.inputShapeBuffer,\
+		self.outputBuffer,\
+		self.weightBuffer,\
+		self.weightShapeBuffer,\
+		self.biasBuffer\
+		).wait()
 
 		t2=time()
 
