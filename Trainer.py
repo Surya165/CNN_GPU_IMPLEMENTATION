@@ -30,19 +30,22 @@ class Trainer:
 		t2 = time()
 		forwardPropagateTime = t2-t1
 
+
+		output = cl.getFilterMapImages(outputBuffer,(layer.number,),"float")
+
 		errorBuffer = outputBuffer
 
 		t1 = time()
 		lambdaValue = 0
 		etaValue = 0.001
 
-		"""
+
 		for count, layer in enumerate(network.layerStack[::-1]):
 			if layer.name != "dense":
 				break
-			errorBuffer = layer.backwardPropagate(errorBuffer,self.cl,lambdaValue,etaValue)
+			errorBuffer = layer.backwardPropagate(errorBuffer,self.cl,lambdaValue,etaValue,count)
 		t2 = time()
-		"""
+
 		backwardPropagateTime = t2-t1
 
 
@@ -52,7 +55,7 @@ class Trainer:
 
 		#output = numpy.zeros((layer.number,),dtype=numpy.float64)
 		#cl.enqueue_read_buffer(cl.commandQueue,outputBuffer,output)
-		output = cl.getFilterMapImages(outputBuffer,(layer.number,),"float")
+
 
 		maxOutput = max(output)
 		for i in range(len(output)):

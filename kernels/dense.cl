@@ -26,15 +26,18 @@ kernel void forwardPropagate(
 }
 
 
-/*
+
 kernel void backwardPropagate
 (
 	global double *errorBuffer,
 	global double *weightBuffer,
 	global int *weightShapeBuffer,
-	global double outputBuffer
+	global double *biasBuffer,
+	global double *outputBuffer,
+	global double *trainingParams
 )
 {
 
+	
+
 }
-*/

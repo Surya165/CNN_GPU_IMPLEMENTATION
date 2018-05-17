@@ -50,18 +50,24 @@ class Dense:
 		return self.outputBuffer
 
 
-	def backwardPropagate(self,errorBuffer,cl,lambdaValue,etaValue,isOuterLayer):
-		if isOuterLayer:
-			errorBufferShape = layer.number
+	def backwardPropagate(self,errorBuffer,cl,lambdaValue,etaValue,layerCount):
 
-		globalSize = layer.weightMatrix.shape
+		trainingParams = numpy.zeros((3,),dtype=numpy.float64)
+		trainingParams[0] = float(lambdaValue)
+		trainingParams[1] = float(etaValue)
+		trainingParams[2] = float(layerCount)
+		trainingParamsBuffer = cl.getBuffer(trainingParams,"READ_WRITE")
+		globalSize = self.weightMatrix.shape
 		t1 = time()
 		self.program.backwardPropagate\
 		(\
 		cl.commandQueue,\
 		globalSize,\
+		None,\
 		errorBuffer,\
 		self.weightBuffer,\
 		self.weightShapeBuffer,\
-		self.outputBuffer\
+		self.biasBuffer,\
+		self.outputBuffer,\
+		trainingParamsBuffer\
 		)
