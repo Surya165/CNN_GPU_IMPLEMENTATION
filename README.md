@@ -1,2 +1,1 @@
-# CNN_GPU_IMPLEMENTATION
-implementing cnn using gpu for speed
+<h1 text-align="center">Documentation</h1>
