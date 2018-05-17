@@ -31,8 +31,10 @@ class MaxPoolLayer:
 
 		self.shape = (mNew,nNew,pNew)
 		self.outputMatrix = numpy.zeros(self.shape)
+		self.maxIndexMatrix = numpy.zeros(tuple(list(self.shape)+[2]))
 		self.outputBuffer = cl.getBuffer(self.outputMatrix,"READ_WRITE")
 
+		self.maxIndexBuffer = cl.getBuffer(self.maxIndexMatrix,"READ_WRITE")
 		self.kernelShapeBuffer = numpy.asarray(self.kernelShape)
 		self.kernelShapeBuffer = cl.getBuffer(self.kernelShapeBuffer,"READ_ONLY")
 		return self.shape
@@ -42,6 +44,8 @@ class MaxPoolLayer:
 		print("MaxPoolLayer" )
 		if self.isCompiled:
 			print(self.shape)
+
+
 	def getAttributeList(self):
 		return (self.outputBuffer,self.kernelShapeBuffer)
 
@@ -55,8 +59,23 @@ class MaxPoolLayer:
 		None,\
 		inputBuffer,\
 		self.outputBuffer,\
-		self.kernelShapeBuffer\
+		self.kernelShapeBuffer,\
+		self.maxIndexBuffer\
 		).wait()
 		t2 = time()
 		print("Time for maxPool is "+str(round((t2-t1)*100000)/100)+"ms")
 		return self.outputBuffer
+
+	def backwardPropagate(self,errorBuffer,cl,lambdaValue,etaValue,count):
+		globalSize = self.shape
+		nextErrorBuffer = cl.getBuffer(numpy.zeros(self.previousLayerShape,dtype=numpy.float64),"READ_WRITE")
+		self.program.backwardPropagate\
+		(\
+		cl.commandQueue,\
+		globalSize,\
+		None,\
+		errorBuffer,\
+		nextErrorBuffer,\
+		self.maxIndexBuffer,\
+		self.previousLayerShape\
+		).wait()

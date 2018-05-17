@@ -1,6 +1,5 @@
 import random
 import numpy
-from compiler import Compiler
 from Trainer import Trainer
 from time import time
 from cl import CL
@@ -26,8 +25,9 @@ class ConvolutionalNeuralNetwork:
 
 	def compile(self,input):
 		t1 = time()
-		comp = Compiler(input)
-		comp.compile(self,self.cl)
+		for count, layer in enumerate(self.layerStack):
+			output = layer.compile(input,self.cl)
+			input = output
 		t2 = time()
 		print("Time Taken to compile is "+str(round((t2-t1)*100000)/100)+"ms")
 		"""

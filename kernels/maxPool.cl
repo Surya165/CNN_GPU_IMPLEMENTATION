@@ -1,4 +1,11 @@
-kernel void forwardPropagate(global float* inputBuffer, global float* outputBuffer, global int * kernelShape)
+#pragma OPENCL EXTENSION cl_khr_fp64 : enable
+kernel void forwardPropagate
+(
+	global double* inputBuffer,
+	global double* outputBuffer,
+	global int * kernelShape,
+	global int* maxIndexBuffer
+)
 {
 
 	int mNew = get_global_id(0);
@@ -39,12 +46,41 @@ kernel void forwardPropagate(global float* inputBuffer, global float* outputBuff
 			if(max < input)
 			{
 				max = input;
+				maxIndexBuffer[index*2] = i;
+				maxIndexBuffer[index*2+1] = j;
 			}
 
 		}
 	}
 	outputBuffer[index] = max;
-	outputBuffer[index] = inputBuffer[index];
+
+
+}
+
+kernel void backwardPropagate
+(
+	global double* errorBuffer,
+	global double* nextErrorBuffer,
+	global int*maxIndexBuffer,
+	global int*previousLayerShape
+)
+{
+	int filterMapNumber = get_global_id(0);
+	int i = get_global_id(1);
+	int j = get_global_id(2);
+
+	int numberOfRows = get_global_size(1);
+	int numberOfCols = get_global_size(2);
+
+	int numberOfRowsInPreviousLayer = previousLayerShape[1];
+	int numberOfColsInPreviousLayer = previousLayerShape[2];
+
+	int outputIndex = filterMapNumber*numberOfRows*numberOfCols+i*numberOfCols+j;
+	int maxIndexI = maxIndexBuffer[2*outputIndex];
+	int maxIndexJ = maxIndexBuffer[2*outputIndex+1];
+	nextErrorBuffer[filterMapNumber*numberOfRowsInPreviousLayer*numberOfColsInPreviousLayer+
+	maxIndexI*numberOfColsInPreviousLayer+maxIndexJ
+	] = errorBuffer[outputIndex];
 
 
 }

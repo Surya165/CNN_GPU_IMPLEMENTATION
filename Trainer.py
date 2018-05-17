@@ -79,7 +79,7 @@ class Trainer:
 				break
 
 
-		self.numberOfEpochs = 300
+		self.numberOfEpochs = 1
 		self.miniBatchSize = 10
 		numberOfImages = 7000/self.miniBatchSize
 		time2 =int(round((totalTime)*numberOfImages*self.numberOfEpochs))

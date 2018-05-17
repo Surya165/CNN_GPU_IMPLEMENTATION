@@ -59,7 +59,7 @@ class Flatten:
 		None,\
 		errorBuffer,\
 		nextErrorBuffer\
-		)
+		).wait()
 		return nextErrorBuffer
 
 	def getAttributeList(self):
