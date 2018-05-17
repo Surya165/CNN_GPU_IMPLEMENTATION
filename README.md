@@ -37,7 +37,7 @@
     </tr>
      <tr>
       <td>
-        <h3Dense</h3>
+        <h3>Dense</h3>
       </td>
       <td>
         The Dense layer object.<br> contains compile, forwardPropagate, backwardPropagate methods
