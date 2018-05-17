@@ -2,6 +2,7 @@ from cl import CL
 from time import time
 import cv2 as cv
 import numpy
+from math import log
 class Trainer:
 	def __init__(self,cl,dataset=None,numberOfEpochs=1,miniBatchSize=1):
 		self.cl = cl
@@ -32,6 +33,18 @@ class Trainer:
 
 
 		output = cl.getFilterMapImages(outputBuffer,(layer.number,),"float")
+		print(output)
+		desiredOutput = [0.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0]
+
+		errorBuffer =numpy.zeros((layer.number,),dtype=numpy.float64)
+
+		for i in range(len(desiredOutput)):
+			a = float(desiredOutput[i])
+			y = float(output[i])
+			errorBuffer[i] = y*log(abs(a+0.00001)) + (1-y)*log(abs(a+0.00001))
+
+		errorBuffer = cl.getBuffer(errorBuffer,"READ_WRITE")
+
 
 		errorBuffer = outputBuffer
 
@@ -40,11 +53,13 @@ class Trainer:
 		etaValue = 0.001
 
 
+
 		for count, layer in enumerate(network.layerStack[::-1]):
-			if layer.name != "dense":
+			if layer.name != "dense" and layer.name != "flatten":
 				break
 			errorBuffer = layer.backwardPropagate(errorBuffer,self.cl,lambdaValue,etaValue,count)
 		t2 = time()
+
 
 		backwardPropagateTime = t2-t1
 

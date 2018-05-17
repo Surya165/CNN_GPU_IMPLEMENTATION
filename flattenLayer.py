@@ -49,8 +49,18 @@ class Flatten:
 		#cl.clear([inputBuffer])
 		return self.outputBuffer
 
-	def backwardPropagate():
-		pass
+	def backwardPropagate(self,errorBuffer,cl,lambdaValue,etaValue,count):
+		globalSize = self.previousLayerShape
+		nextErrorBuffer = cl.getBuffer(numpy.zeros(self.previousLayerShape,dtype=numpy.float64),"READ_WRITE")
+		self.program.backwardPropagate\
+		(\
+		cl.commandQueue,\
+		globalSize,\
+		None,\
+		errorBuffer,\
+		nextErrorBuffer\
+		)
+		return nextErrorBuffer
 
 	def getAttributeList(self):
 		return(self.inputShapeBuffer,self.outputBuffer)

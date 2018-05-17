@@ -58,6 +58,8 @@ class Dense:
 		trainingParams[2] = float(layerCount)
 		trainingParamsBuffer = cl.getBuffer(trainingParams,"READ_WRITE")
 		globalSize = self.weightMatrix.shape
+		nextErrorBuffer = numpy.zeros(self.previousLayerShape,dtype=numpy.float64)
+		nextErrorBuffer = cl.getBuffer(nextErrorBuffer,"READ_WRITE")
 		t1 = time()
 		self.program.backwardPropagate\
 		(\
@@ -69,5 +71,7 @@ class Dense:
 		self.weightShapeBuffer,\
 		self.biasBuffer,\
 		self.outputBuffer,\
-		trainingParamsBuffer\
+		trainingParamsBuffer,\
+		nextErrorBuffer\
 		)
+		return nextErrorBuffer
