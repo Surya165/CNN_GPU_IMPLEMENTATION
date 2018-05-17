@@ -30,14 +30,7 @@ class ConvolutionalNeuralNetwork:
 			input = output
 		t2 = time()
 		print("Time Taken to compile is "+str(round((t2-t1)*100000)/100)+"ms")
-		"""
-		for count, layer in enumerate(self.layerStack):
-			if count == 0:
-				input = tuple([len(input)] + list(input))
-			output = layer.compile(input)
-			input = output
-
-		return input"""
+		
 
 	def train(self,dataset=None,numberOfEpochs=1,miniBatchSize=1):
 		trainer = Trainer(self.cl,dataset,numberOfEpochs=1,miniBatchSize=1)

@@ -73,5 +73,5 @@ class Dense:
 		self.outputBuffer,\
 		trainingParamsBuffer,\
 		nextErrorBuffer\
-		)
+		).wait()
 		return nextErrorBuffer
