@@ -15,7 +15,6 @@ class ConvolutionalLayer:
 			print(str(self.shape))
 			print(str(self.weightMatrix.shape))
 	def compile(self,previousLayerShape,cl):
-		self.cl = cl
 		self.previousLayerShape = previousLayerShape
 		self.isCompiled = True
 		shape = previousLayerShape
@@ -52,9 +51,12 @@ class ConvolutionalLayer:
 		self.inputShapeBuffer = cl.getBuffer(self.inputShapeBuffer,"READ_ONLY")
 		return self.shape
 
-	def getAttributeList(self):
-		return (self.inputShapeBuffer,self.outputBuffer,\
-		self.weightBuffer,self.weightShapeBuffer,self.biasBuffer)
+	def getAttributeList(self,cl):
+		outputMatrix = cl.getFilterMapImages(self.outputBuffer,self.outputMatrix.shape,"float")
+		weightMatrix = cl.getFilterMapImages(self.weightBuffer,self.weightMatrix.shape,"float")
+		biasMatrix = cl.getFilterMapImages(self.biasBuffer,self.biasMatrix.shape,"float")
+		return (self.previousLayerShape,outputMatrix,\
+		weightMatrix,self.weightMatrix.shape,biasMatrix)
 
 
 
@@ -81,11 +83,6 @@ class ConvolutionalLayer:
 		return self.outputBuffer
 
 	def backwardPropagate(self,errorBuffer,cl,lambdaValue,etaValue,count,previousOutputBuffer):
-		trainingParams = numpy.zeros((3,),dtype=numpy.float64)
-		trainingParams[0] = lambdaValue
-		trainingParams[1] = etaValue
-		trainingParams[2] = count
-		trainingParamsBuffer = cl.getBuffer(trainingParams,"READ_WRITE")
 		globalSize = self.weightMatrix.shape[0:2]
 		nextErrorBuffer = numpy.zeros(self.previousLayerShape,dtype=numpy.float64)
 		nextErrorBuffer = cl.getBuffer(nextErrorBuffer,"READ_WRITE")
@@ -102,7 +99,7 @@ class ConvolutionalLayer:
 		self.weightShapeBuffer,\
 		biasBuffer,\
 		self.outputBuffer,\
-		trainingParamsBuffer,\
+		etaValue,\
 		nextErrorBuffer,\
 		previousOutputBuffer,\
 		self.inputShapeBuffer\

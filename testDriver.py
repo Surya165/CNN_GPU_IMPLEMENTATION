@@ -19,12 +19,12 @@ def main():
 	sleep(3)
 
 	model = ConvolutionalNeuralNetwork()
-	model.addLayer(ConvolutionalLayer(100,(3,3)))
-	model.addLayer(MaxPoolLayer((3,3)))
+	model.addLayer(ConvolutionalLayer(20,(5,5)))
+	model.addLayer(MaxPoolLayer((2,2)))
 	#model.addLayer(ConvolutionalLayer(100,(5,5)))
 	#model.addLayer(MaxPoolLayer((5,5)))
 	model.addLayer(Flatten())
-	model.addLayer(Dense(30))
+	model.addLayer(Dense(100))
 	model.addLayer(Dense(10))
 
 	f = open("trainingImage.pkl","rb")
@@ -32,8 +32,8 @@ def main():
 	model.compile(inputImage.shape)
 	print("##########\n\n")
 	#model.printModel()
-	numberOfEpochs = 1
-	miniBatchSize = 1
+	numberOfEpochs = 30
+	miniBatchSize = 5
 	model.train(data,numberOfEpochs,miniBatchSize)
 
 

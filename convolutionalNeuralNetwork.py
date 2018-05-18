@@ -38,6 +38,11 @@ class ConvolutionalNeuralNetwork:
 		trainer.train(self)
 
 	def saveModel(self,name):
+		layers = self.layerStack
+		layerAttributes = []
+		for layer in layers:
+			layerAttributes.append(layer.getAttributeList(self.cl))
+
 		f = open(name,"wb")
-		pkl.dump(self.layerStack,f)
+		pkl.dump(layerAttributes,f)
 		f.close()

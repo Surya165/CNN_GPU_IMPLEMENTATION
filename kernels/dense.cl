@@ -37,16 +37,15 @@ kernel void backwardPropagate
 	global int *weightShapeBuffer,
 	global double *biasBuffer,
 	global double *outputBuffer,
-	global int *trainingParams,
+	global float *trainingParams,
 	global double *nextErrorBuffer,
 	global double *previousOutputBuffer
 )
 {
 
 
-	int epochCount = trainingParams[2] / 100;
-
-	float eta = 9.0;
+	float eta = trainingParams[0];
+	eta = 30.0;
 
 
 	int numberOfNeurons = get_global_size(0);

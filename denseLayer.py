@@ -52,11 +52,6 @@ class Dense:
 
 
 	def backwardPropagate(self,errorBuffer,cl,lambdaValue,etaValue,layerCount,previousOutputBuffer):
-		trainingParams = numpy.zeros((3,),dtype=numpy.float64)
-		trainingParams[0] = lambdaValue
-		trainingParams[1] = etaValue
-		trainingParams[2] = layerCount
-		trainingParamsBuffer = cl.getBuffer(trainingParams,"READ_WRITE")
 		globalSize = self.weightMatrix.shape
 		nextErrorBuffer = numpy.zeros(self.previousLayerShape,dtype=numpy.float64)
 		nextErrorBuffer = cl.getBuffer(nextErrorBuffer,"READ_WRITE")
@@ -72,9 +67,19 @@ class Dense:
 		self.weightShapeBuffer,\
 		self.biasBuffer,\
 		self.outputBuffer,\
-		trainingParamsBuffer,\
+		etaValue,\
 		nextErrorBuffer,\
 		previousOutputBuffer\
 		).wait()
 		self.shit = pyopencl.enqueue_read_buffer(cl.commandQueue,self.biasBuffer,self.biasMatrix)
 		return nextErrorBuffer
+
+	def getAttributeList(self,cl):
+		biasMatrix = cl.getFilterMapImages(self.biasBuffer,self.biasMatrix.shape,"float")
+		weightMatrix = cl.getFilterMapImages(self.weightBuffer,self.weightMatrix.shape,"float")
+		outputMatrix = cl.getFilterMapImages(self.outputBuffer,self.outputMatrix.shape,"float")
+		return(weightMatrix,\
+		self.weightMatrix.shape,\
+		biasMatrix,\
+		outputMatrix\
+		)

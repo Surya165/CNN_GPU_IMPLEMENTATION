@@ -107,7 +107,7 @@ kernel void backwardPropagate
 	global int *weightShapeBuffer,
 	global double *biasBuffer,
 	global double *outputBuffer,
-	global int* trainingParams,
+	global float* trainingParams,
 	global double *nextErrorBuffer,
 	global double *previousOutputBuffer,
 	global int* previousLayerShape
@@ -118,9 +118,8 @@ kernel void backwardPropagate
 	int j = get_global_id(2);
 
 
-	int epochCount = trainingParams[2] / 100;
-	float etaValue = 9.0;
-
+	float etaValue = trainingParams[0];
+	etaValue = 30.0;
 
 
 	int numberOfRowsInKernel = weightShapeBuffer[1];

@@ -80,3 +80,12 @@ class MaxPoolLayer:
 		self.maxIndexBuffer,\
 		self.previousLayerShapeBuffer\
 		).wait()
+
+	def getAttributeList(self,cl):
+		outputMatrix = cl.getFilterMapImages(self.outputBuffer,self.outputMatrix.shape,"float")
+		maxIndexMatrix = cl.getFilterMapImages(self.maxIndexBuffer,self.maxIndexMatrix.shape,"float")
+		return(
+		outputMatrix,\
+		self.kernelShape,\
+		maxIndexMatrix\
+		)

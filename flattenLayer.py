@@ -62,5 +62,6 @@ class Flatten:
 		).wait()
 		return nextErrorBuffer
 
-	def getAttributeList(self):
-		return(self.inputShapeBuffer,self.outputBuffer)
+	def getAttributeList(self,cl):
+		outputMatrix = cl.getFilterMapImages(self.outputBuffer,self.outputMatrix.shape,"float")
+		return(self.previousLayerShape,outputMatrix)
